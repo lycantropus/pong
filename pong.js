@@ -7,9 +7,9 @@ var playerHuman;
 var playerBot;
 var ballImage;
 var playerImage;
+
+
 var startMenuBackground;
-
-
 var titleLabel;
 var loadingBarContainer;
 var loadProgressLabel;
@@ -23,59 +23,82 @@ var progresPrecentage;
 
 
 
+function resize() {
+    stage.canvas.width = window.innerWidth;
+    stage.canvas.height = window.innerHeight;
+    if(background!=null)
+    background.setTransform(0,0,canvas.width/backgroundImage.width , (canvas.height/backgroundImage.height ));
+
+    if(playerHuman != null)
+    playerHuman.setTransform(10, canvas.height/2 - playerImage.height, 2, 2);
+
+    if(playerBot!=null)
+    playerBot.setTransform(canvas.width - 35, canvas.height/2 - playerImage.height, 2, 2);
+
+    if(ball!=null)
+    ball.setTransform(ball.x, ball.y, 2, 2);
+
+    stage.update();
+}
+
+
 function init() {
 
-canvas = document.getElementById("myCanvas");
-stage = new createjs.Stage(canvas);
+    canvas = document.getElementById("myCanvas");
+    stage = new createjs.Stage(canvas);
+
+    window.addEventListener('resize', resize, false);
+
+    startMenuBackground = new createjs.Shape();
+    startMenuBackground.graphics.beginFill('black').drawRect(0, 0, canvas.width, canvas.height);
+
+    stage.addChild(startMenuBackground);
+
+    LoadingBarColor = createjs.Graphics.getRGB(50,250,60);
+
+    titleLabel = new createjs.Text("PONG", "60px Verdana", LoadingBarColor);
+    titleLabel.lineWidth= 400;
+    titleLabel.textAlign = "center";
+    titleLabel.x=canvas.width/2;
+    titleLabel.y=canvas.height/4;
+
+    loadProgressLabel = new createjs.Text("","18px Verdana",LoadingBarColor);
+    loadProgressLabel.lineWidth = 200;
+    loadProgressLabel.textAlign = "center";
+    loadProgressLabel.x = canvas.width/2;
+    loadProgressLabel.y = canvas.height/2 + 50;
+    stage.addChild(loadProgressLabel, titleLabel);
+
+    loadingBarContainer = new createjs.Container();
+    loadingBarHeight = 20;
+    loadingBarWidth = 300;
 
 
+    loadingBar = new createjs.Shape();
+    loadingBar.graphics.beginFill(LoadingBarColor).drawRect(0, 0, 1, loadingBarHeight).endFill();
+    frame = new createjs.Shape();
+    padding = 3;
+    frame.graphics.setStrokeStyle(1).beginStroke(LoadingBarColor).drawRect(-padding/2, -padding/2, loadingBarWidth+padding, loadingBarHeight+padding);
 
-startMenuBackground = new createjs.Shape();
-startMenuBackground.graphics.beginFill('black').drawRect(0, 0, canvas.width, canvas.height);
-
-stage.addChild(startMenuBackground);
-
-LoadingBarColor = createjs.Graphics.getRGB(50,250,60);
-
-titleLabel = new createjs.Text("PONG", "60px Verdana", LoadingBarColor);
-titleLabel.lineWidth= 400;
-titleLabel.textAlign = "center";
-titleLabel.x=canvas.width/2;
-titleLabel.y=canvas.height/4;
-
-loadProgressLabel = new createjs.Text("","18px Verdana",LoadingBarColor);
-loadProgressLabel.lineWidth = 200;
-loadProgressLabel.textAlign = "center";
-loadProgressLabel.x = canvas.width/2;
-loadProgressLabel.y = canvas.height/2 + 50;
-stage.addChild(loadProgressLabel, titleLabel);
-
-loadingBarContainer = new createjs.Container();
-loadingBarHeight = 20;
-loadingBarWidth = 300;
+    loadingBarContainer.addChild(loadingBar, frame);
+    loadingBarContainer.x = Math.round(canvas.width/2 - loadingBarWidth/2);
+    loadingBarContainer.y = Math.round(canvas.height/2 - loadingBarHeight/2);
+    stage.addChild(loadingBarContainer);
 
 
-loadingBar = new createjs.Shape();
-loadingBar.graphics.beginFill(LoadingBarColor).drawRect(0, 0, 1, loadingBarHeight).endFill();
-frame = new createjs.Shape();
-padding = 3;
-frame.graphics.setStrokeStyle(1).beginStroke(LoadingBarColor).drawRect(-padding/2, -padding/2, loadingBarWidth+padding, loadingBarHeight+padding);
+    preload = new createjs.LoadQueue(false);
+    preload.addEventListener("complete", handleComplete);
+    preload.addEventListener("progress", handleProgress);
 
-loadingBarContainer.addChild(loadingBar, frame);
-loadingBarContainer.x = Math.round(canvas.width/2 - loadingBarWidth/2);
-loadingBarContainer.y = Math.round(canvas.height/2 - loadingBarHeight/2);
-stage.addChild(loadingBarContainer);
+    //preload.loadFile({id: "background", src:"images/background.png"});
+    preload.loadManifest([
+        {id: "background", src:"images/background.png"},
+        {id: "ball", src:"images/ball.png"},
+        {id: "player", src:"images/player.png"}
+        ]);
 
-
-preload = new createjs.LoadQueue(false);
-preload.addEventListener("complete", handleComplete);
-preload.addEventListener("progress", handleProgress);
-
-preload.loadFile({id: "background", src:"images/background.png"});
-preload.loadManifest([{id: "ball", src:"images/ball.png"},
-        {id: "player", src:"images/player.png"}]);
- 
-stage.update();
+    resize();
+    stage.update();
 
 
 //createjs.Ticker.addEventListener("tick", tick);
@@ -84,30 +107,28 @@ stage.update();
 
 function start() {
 
- background = new createjs.Bitmap(backgroundImage);
-    console.log("racio width: "+ canvas.width/backgroundImage.width);
-    console.log("racio heigth: "+ canvas.height/backgroundImage.height);
-    console.log("bg heigth: " + backgroundImage.height);
+    background = new createjs.Bitmap(backgroundImage);
+
     background.setTransform(0,0,canvas.width/backgroundImage.width , (canvas.height/backgroundImage.height ));
- stage.addChild(background);
+    stage.addChild(background);
 
  
- ball = new createjs.Bitmap(ballImage);
-    ball.setTransform(canvas.width/2, canvas.height/2, 2, 2);
+    ball = new createjs.Bitmap(ballImage);
+    ball.setTransform(canvas.width/2 - ballImage.width, canvas.height/2 - ballImage.height, 2, 2);
 
- stage.addChild(ball);
+    stage.addChild(ball);
  
 
- playerHuman = new createjs.Bitmap(playerImage);
- playerBot = new createjs.Bitmap(playerImage);
-
-    playerHuman.setTransform(10, canvas.height/2, 2, 2);
-    playerBot.setTransform(canvas.width-35, canvas.height/2, 2, 2);
- stage.addChild(playerHuman, playerBot);
+    playerHuman = new createjs.Bitmap(playerImage);
+    playerBot = new createjs.Bitmap(playerImage);
+    console.log(playerHuman.height);
+    playerHuman.setTransform(10, canvas.height/2 - playerImage.height, 2, 2);
+    playerBot.setTransform(canvas.width-35, canvas.height/2 - playerImage.height, 2, 2);
+    stage.addChild(playerHuman, playerBot);
  
  
  //updating the stage
- stage.update();
+    stage.update();
 }
 
 function handleProgress() {
@@ -123,23 +144,25 @@ function handleProgress() {
 
 function handleComplete() {
   
- backgroundImage = preload.getResult("background");
- ballImage = preload.getResult("ball");
- playerImage = preload.getResult("player");
- 
- loadProgressLabel.text = "Loading complete click to start";
- stage.update();
- 
- canvas.addEventListener("click", handleClick);
+     backgroundImage = preload.getResult("background");
+     ballImage = preload.getResult("ball");
+     playerImage = preload.getResult("player");
+
+     loadProgressLabel.text = "Loading complete click to start";
+     stage.update();
+
+     canvas.addEventListener("click", handleClick);
 }
 
 function handleClick() {
  
- start();
-  
- stage.removeChild(loadProgressLabel, loadingBarContainer, titleLabel);
- canvas.removeEventListener("click", handleClick);
- stage.update();
+    start();
+
+    stage.removeChild(loadProgressLabel, loadingBarContainer, titleLabel);
+    canvas.removeEventListener("click", handleClick);
+
+    resize();
+    stage.update();
 }
 
 
