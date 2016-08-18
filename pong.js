@@ -1,163 +1,148 @@
 var stage;
 var canvas;
-var bg;
-
-var stagewidth= 1300;
-var stageheight=800;
-
-var main;
-var startB;
-var creditsB;
-var credits;
-
-
-var player;
+var backgroundImage;
+var background;
 var ball;
-var cpu;
-var win;
-var lose;
-
-var playerScore;
-var cpuScore;
-var cpuSpeed=6;
-
-var xSpeed = 5;
-var ySpeed = 5;
-
-//var tkr = new Object;
-
-var queue;
-var manifest;
-var totalLoaded=0;
-
-//var TitleView = new Container();
-
-function setupManifest(){
-manifest = [
-            {src:"assets/bg.png", id:"bg"}
-            ];
-}
-
-function startPreload(){
-	queue = new createjs.LoadQueue(true);
-    queue.installPlugin(createjs.Sound);          
-    queue.on("fileload", handleFileLoad);
-    queue.on("complete", loadComplete);
-    queue.on("error", loadError);
-    queue.loadManifest(manifest);
-}
+var playerHuman;
+var playerBot;
+var ballImage;
+var playerImage;
+var startMenuBackground;
 
 
-function handleFileLoad(event) {
-    console.log("A file has loaded of type: " + event.item.type);
-    if(event.item.id == "bg"){
-        console.log("bg is loaded");
-        //create bitmap here
-    }
+var titleLabel;
+var loadingBarContainer;
+var loadProgressLabel;
+var loadingBarHeight;
+var loadingBarWidth;
+var LoadingBarColor;
+var loadingBar;
+var frame;
+var preload;
+var progresPrecentage;
 
-}
- 
- 
-function loadError(evt) {
-    console.log("Error!",evt.text);
-}
- 
- 
-
- 
-function loadComplete(event) {
-    console.log("Finished Loading Assets");
-}
-
-
-function drawBackground() {
-    var rect = new createjs.Shape();
-    rect.graphics.beginFill("#000").drawRect(0, 0, 600, 600);
-    stage.addChild(rect);
-
-    for (var i = 0; i < 180; i++) {
-        var randNumX = Math.floor(Math.random() * stagewidth);
-        var randNumY = Math.floor(Math.random() * stageheight);
-        var circle = new createjs.Shape();
-   
-        circle.graphics.beginFill("#FFF").drawCircle(randNumX, randNumY, 2);
-        stage.addChild(circle);
-    }
-
-}
 
 
 function init() {
 
 canvas = document.getElementById("myCanvas");
 stage = new createjs.Stage(canvas);
-  queue = new createjs.LoadQueue(true);
-  //queue.installPlugin(createjs.Sound);
-  drawBackground();
-var progressText = new createjs.Text("", "20px Arial", "#000000");
-progressText.x = 300 - progressText.getMeasuredWidth() / 2;
-progressText.y = 20;
-stage.addChild(progressText);
 
-setupManifest();
-startPreload();
+
+
+startMenuBackground = new createjs.Shape();
+startMenuBackground.graphics.beginFill('black').drawRect(0, 0, canvas.width, canvas.height);
+
+stage.addChild(startMenuBackground);
+
+LoadingBarColor = createjs.Graphics.getRGB(50,250,60);
+
+titleLabel = new createjs.Text("PONG", "60px Verdana", LoadingBarColor);
+titleLabel.lineWidth= 400;
+titleLabel.textAlign = "center";
+titleLabel.x=canvas.width/2;
+titleLabel.y=canvas.height/4;
+
+loadProgressLabel = new createjs.Text("","18px Verdana",LoadingBarColor);
+loadProgressLabel.lineWidth = 200;
+loadProgressLabel.textAlign = "center";
+loadProgressLabel.x = canvas.width/2;
+loadProgressLabel.y = canvas.height/2 + 50;
+stage.addChild(loadProgressLabel, titleLabel);
+
+loadingBarContainer = new createjs.Container();
+loadingBarHeight = 20;
+loadingBarWidth = 300;
+
+
+loadingBar = new createjs.Shape();
+loadingBar.graphics.beginFill(LoadingBarColor).drawRect(0, 0, 1, loadingBarHeight).endFill();
+frame = new createjs.Shape();
+padding = 3;
+frame.graphics.setStrokeStyle(1).beginStroke(LoadingBarColor).drawRect(-padding/2, -padding/2, loadingBarWidth+padding, loadingBarHeight+padding);
+
+loadingBarContainer.addChild(loadingBar, frame);
+loadingBarContainer.x = Math.round(canvas.width/2 - loadingBarWidth/2);
+loadingBarContainer.y = Math.round(canvas.height/2 - loadingBarHeight/2);
+stage.addChild(loadingBarContainer);
+
+
+preload = new createjs.LoadQueue(false);
+preload.addEventListener("complete", handleComplete);
+preload.addEventListener("progress", handleProgress);
+
+preload.loadFile({id: "background", src:"images/background.png"});
+preload.loadManifest([{id: "ball", src:"images/ball.png"},
+        {id: "player", src:"images/player.png"}]);
+ 
 stage.update();
 
 
-
-  //queue.load();
-  //console.log(manifest);
-
-
-/*var ball = new createjs.Shape();
-ball.addEventListener("click", handleClick);
-ball.graphics.beginFill("#000000").drawCircle(0,0,25);
-ball.x=50;
-ball.y=50;
-
-var rectLeft = new createjs.Shape();
-
-rectLeft.graphics.beginFill("#000000").drawRect(0, 0, 20, 100);
-rectLeft.x= 20;
-rectLeft.y= 20;*/
-
-
-
-
-//createjs.Tween.get(ball, {loop:true}).to({x:450}, 3000).to({x:50}, 3000);
-createjs.Ticker.addEventListener("tick", tick);
-
-//stage.addChild(ball);
-//stage.addChild(rectLeft);
-
+//createjs.Ticker.addEventListener("tick", tick);
 
 }
 
+function start() {
 
+ background = new createjs.Bitmap(backgroundImage);
+    console.log("racio width: "+ canvas.width/backgroundImage.width);
+    console.log("racio heigth: "+ canvas.height/backgroundImage.height);
+    console.log("bg heigth: " + backgroundImage.height);
+    background.setTransform(0,0,canvas.width/backgroundImage.width , (canvas.height/backgroundImage.height ));
+ stage.addChild(background);
 
-function addTitleView(){
-	startB.x = 240 - 31.5;
-    startB.y = 160;
-    startB.name = 'startB';
+ 
+ ball = new createjs.Bitmap(ballImage);
+    ball.setTransform(canvas.width/2, canvas.height/2, 2, 2);
+
+ stage.addChild(ball);
+ 
+
+ playerHuman = new createjs.Bitmap(playerImage);
+ playerBot = new createjs.Bitmap(playerImage);
+
+    playerHuman.setTransform(10, canvas.height/2, 2, 2);
+    playerBot.setTransform(canvas.width-35, canvas.height/2, 2, 2);
+ stage.addChild(playerHuman, playerBot);
+ 
+ 
+ //updating the stage
+ stage.update();
+}
+
+function handleProgress() {
+ 
+    loadingBar.scaleX = preload.progress * loadingBarWidth;
+ 
+    progresPrecentage = Math.round(preload.progress*100);
+    loadProgressLabel.text = progresPrecentage + "% Loaded" ;
      
-    creditsB.x = 241 - 42;
-    creditsB.y = 200;
-     
-    TitleView.addChild(main, startB, creditsB);
-    stage.addChild(bg, TitleView);
     stage.update();
-     
-    // Button Listeners
-     
-    startB.onPress = tweenTitleView;
-    creditsB.onPress = showCredits;
+ 
+}
+
+function handleComplete() {
+  
+ backgroundImage = preload.getResult("background");
+ ballImage = preload.getResult("ball");
+ playerImage = preload.getResult("player");
+ 
+ loadProgressLabel.text = "Loading complete click to start";
+ stage.update();
+ 
+ canvas.addEventListener("click", handleClick);
+}
+
+function handleClick() {
+ 
+ start();
+  
+ stage.removeChild(loadProgressLabel, loadingBarContainer, titleLabel);
+ canvas.removeEventListener("click", handleClick);
+ stage.update();
 }
 
 
-
-function handleClick(event){
-	console.log("clicked");
-}
 
 function tick(event){
 	/*stage.getChildAt(0).x+=5;
