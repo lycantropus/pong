@@ -1,3 +1,5 @@
+
+//game elements
 var stage;
 var canvas;
 var backgroundImage;
@@ -7,8 +9,15 @@ var playerHuman;
 var playerBot;
 var ballImage;
 var playerImage;
+var win;
+var lose;
+var playerScore;
+var botScore;
+var botSpeed;
+var ballSpeedX;
+var ballSpeedY;
 
-
+//loading screen
 var startMenuBackground;
 var titleLabel;
 var loadingBarContainer;
@@ -37,6 +46,12 @@ function resize() {
 
     if(ball!=null)
     ball.setTransform(ball.x, ball.y, 2, 2);
+
+    if(playerScore!=null)
+    playerScore.setTransform(canvas.width/2 - canvas.width/20 -10, canvas.height/20);
+
+    if(botScore!=null)
+    botScore.setTransform(canvas.width/2 + canvas.width/20 - 10, canvas.height/20);
 
     stage.update();
 }
@@ -121,10 +136,17 @@ function start() {
 
     playerHuman = new createjs.Bitmap(playerImage);
     playerBot = new createjs.Bitmap(playerImage);
-    console.log(playerHuman.height);
+    //console.log(playerHuman.height);
     playerHuman.setTransform(10, canvas.height/2 - playerImage.height, 2, 2);
     playerBot.setTransform(canvas.width-35, canvas.height/2 - playerImage.height, 2, 2);
     stage.addChild(playerHuman, playerBot);
+
+    playerScore = new createjs.Text("0"," bold 30px Verdana",LoadingBarColor  );
+    botScore = new createjs.Text("0"," bold 30px Verdana",LoadingBarColor  );
+
+    playerScore.setTransform(canvas.width/2 - canvas.width/20 -10, canvas.height/20);
+    botScore.setTransform(canvas.width/2 + canvas.width/20 - 10, canvas.height/20);
+    stage.addChild(playerScore, botScore);
  
  
  //updating the stage
