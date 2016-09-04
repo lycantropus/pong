@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="7b20bd23-3a3f-4f2e-b076-452f36fad10f" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pong.js" afterPath="$PROJECT_DIR$/pong.js" />
-    </list>
+    <list default="true" id="7b20bd23-3a3f-4f2e-b076-452f36fad10f" name="Default" comment="" />
     <ignored path="pong.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
