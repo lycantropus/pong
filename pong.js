@@ -15,6 +15,8 @@ var botScore;
 var botSpeed;
 var ballSpeedX;
 var ballSpeedY;
+var initialBallX;
+var initialBallY;
 
 //loading screen
 var startMenuBackground;
@@ -38,13 +40,13 @@ function resize() {
     background.setTransform(0,0,canvas.width/backgroundImage.width , (canvas.height/backgroundImage.height ));
 
     if(playerHuman != null)
-    playerHuman.setTransform(10, canvas.height/2 - playerImage.height, 2, 2);
+    playerHuman.setTransform(10, canvas.height/2 - playerImage.height, 1, 1);
 
     if(playerBot!=null)
-    playerBot.setTransform(canvas.width - 35, canvas.height/2 - playerImage.height, 2, 2);
+    playerBot.setTransform(canvas.width - 35, canvas.height/2 - playerImage.height, 1, 1);
 
     if(ball!=null)
-    ball.setTransform(canvas.width/2 - ballImage.width, canvas.height/2 - ballImage.height, 2, 2);
+    ball.setTransform(canvas.width/2 - ballImage.width, canvas.height/2 - ballImage.height, 1, 1);
 
     if(playerScore!=null)
     playerScore.setTransform(canvas.width/2 - canvas.width/20 -10, canvas.height/20);
@@ -113,8 +115,10 @@ function init() {
 
     resize();
 
-    ballSpeedX=5;
-    ballSpeedY=-5;
+    ballSpeedX=11;
+    ballSpeedY=-11;
+
+
     stage.update();
 
 
@@ -131,8 +135,11 @@ function start() {
 
  
     ball = new createjs.Bitmap(ballImage);
-    ball.setTransform(canvas.width/2 - ballImage.width, canvas.height/2 - ballImage.height, 2, 2);
-
+    ball.setTransform(canvas.width/2 - ballImage.width, canvas.height/2 - ballImage.height, 1, 1);
+    initialBallX=ball.x;
+    initialBallY=ball.y;
+    console.log("startinitx: "+initialBallX);
+    console.log("startinity: "+initialBallY);
     stage.addChild(ball);
  
 
@@ -190,6 +197,14 @@ function handleClick() {
     stage.update();
 }
 
+//repositions all props to initial state;
+function reset(){
+    //ball.x= initialBall.x;
+    //ball.y= initialBall.y;
+    ball.setTransform(canvas.width/2 - ballImage.width, canvas.height/2 - ballImage.height, 1, 1);
+
+}
+
 function update(){
 
     //ball
@@ -198,12 +213,12 @@ function update(){
 
 
     //bot
-    //veloc 6
+    //veloc 9
     if(playerBot.y < ball.y && playerBot.y <= canvas.height - (39+ playerImage.height*2)) {
-        playerBot.y = playerBot.y + 6;
+        playerBot.y = playerBot.y + 9;
     }
     else if(playerBot.y > ball.y && playerBot.y >= 39) {
-        playerBot.y = playerBot.y - 6;
+        playerBot.y = playerBot.y - 9;
     }
 
     //horizontal inversion
@@ -222,7 +237,7 @@ function update(){
     {
         ballSpeedX= -ballSpeedX;
         botScore.text = parseInt(botScore.text + 1);
-        //reset();
+        reset();
         //SoundJS.play('enemyScore');
     }
 
@@ -231,7 +246,7 @@ function update(){
     {
         ballSpeedX= -ballSpeedX;
         playerScore.text = parseInt(playerScore.text + 1);
-        //reset();
+        reset();
         //SoundJS.play('playerScore');
     }
 
@@ -250,6 +265,11 @@ function update(){
         ballSpeedX *= -1;
         //SoundJS.play('hit');
     }
+
+
+    //console.log("xspeed: "+ ball.x);
+    //console.log("yspeed: "+ ballSpeedY);
+
 
 }
 
