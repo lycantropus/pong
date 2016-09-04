@@ -113,6 +113,9 @@ function init() {
         ]);
 
     resize();
+
+    ballSpeedX=5;
+    ballSpeedY=-5;
     stage.update();
 
 
@@ -188,29 +191,77 @@ function handleClick() {
     stage.update();
 }
 
-function movePlayerUp(delta){
-    return delta;
+function update(){
+
+    //ball
+    ball.x+=ballSpeedX;
+    ball.y+=ballSpeedY;
+
+
+    //bot
+    if(playerBot.y < ball.y) {
+        playerBot.y = playerBot.y + 4;
+    }
+    else if(playerBot.y > ball.y) {
+        playerBot.y = playerBot.y - 4;
+    }
+
+    //horizontal inversion
+    if(ball.y <= 38)
+    {
+        ballSpeedY = -ballSpeedY;
+        //SoundJS.play('wall');
+    }
+    if(ball.y >= canvas.height -  playerImage.height){
+        ballSpeedY = -ballSpeedY;
+        //SoundJS.play('wall');
+    }
+
+    //CPU Score
+
+    if((ball.x) <= 0)
+    {
+        ballSpeedX= -ballSpeedX;
+        botScore.text = parseInt(botScore.text + 1);
+        //reset();
+        //SoundJS.play('enemyScore');
+    }
+
+    //Player Score
+
+    if(ball.x > canvas.width)
+    {
+        ballSpeedX= -ballSpeedX;
+        playerScore.text = parseInt(playerScore.text + 1);
+        //reset();
+        //SoundJS.play('playerScore');
+    }
+
 }
 
-var key;
+
 
 function tick(event){
 	/*stage.getChildAt(0).x+=5;
 	if(stage.getChildAt(0).x >=1300){
 		stage.getChildAt(0).x=0;
 	}*/
-    if(key.isPressed('up'))
+    if(key.isPressed('up')|| key.isPressed('w'))
     {
         if(playerHuman.y>=39)
         {
         playerHuman.y-=15;
         }
     }
-    if(key.isPressed('down'))
+    if(key.isPressed('down') || key.isPressed('d'))
     {
-        console.log('iei');
-        playerHuman.y+=15;
+        if(playerHuman.y<=canvas.height - (39+ playerImage.height*2))
+        {
+            playerHuman.y+=15;
+        }
     }
+
+    update();
 
 	stage.update();
 }
