@@ -1,4 +1,3 @@
-
 //game elements
 var stage;
 var canvas;
@@ -199,11 +198,12 @@ function update(){
 
 
     //bot
-    if(playerBot.y < ball.y) {
-        playerBot.y = playerBot.y + 4;
+    //veloc 6
+    if(playerBot.y < ball.y && playerBot.y <= canvas.height - (39+ playerImage.height*2)) {
+        playerBot.y = playerBot.y + 6;
     }
-    else if(playerBot.y > ball.y) {
-        playerBot.y = playerBot.y - 4;
+    else if(playerBot.y > ball.y && playerBot.y >= 39) {
+        playerBot.y = playerBot.y - 6;
     }
 
     //horizontal inversion
@@ -217,8 +217,7 @@ function update(){
         //SoundJS.play('wall');
     }
 
-    //CPU Score
-
+    //bot score
     if((ball.x) <= 0)
     {
         ballSpeedX= -ballSpeedX;
@@ -227,14 +226,29 @@ function update(){
         //SoundJS.play('enemyScore');
     }
 
-    //Player Score
-
+    //player score
     if(ball.x > canvas.width)
     {
         ballSpeedX= -ballSpeedX;
         playerScore.text = parseInt(playerScore.text + 1);
         //reset();
         //SoundJS.play('playerScore');
+    }
+
+    //bot collision
+
+    if(ball.x + 30 > playerBot.x && ball.x + 30 < playerBot.x + 22 && ball.y >= playerBot.y && ball.y < playerBot.y + 75)
+    {
+        ballSpeedX *= -1;
+        //SoundJS.play('hit');
+    }
+
+    //Player collision
+
+    if(ball.x <= playerHuman.x + 22 && ball.x > playerHuman.x && ball.y >= playerHuman.y && ball.y < playerHuman.y + 75)
+    {
+        ballSpeedX *= -1;
+        //SoundJS.play('hit');
     }
 
 }
