@@ -45,7 +45,7 @@ function resize() {
     playerBot.setTransform(canvas.width - 35, canvas.height/2 - playerImage.height, 2, 2);
 
     if(ball!=null)
-    ball.setTransform(ball.x, ball.y, 2, 2);
+    ball.setTransform(canvas.width/2 - ballImage.width, canvas.height/2 - ballImage.height, 2, 2);
 
     if(playerScore!=null)
     playerScore.setTransform(canvas.width/2 - canvas.width/20 -10, canvas.height/20);
@@ -116,7 +116,7 @@ function init() {
     stage.update();
 
 
-//createjs.Ticker.addEventListener("tick", tick);
+    createjs.Ticker.addEventListener("tick", tick);
 
 }
 
@@ -147,10 +147,11 @@ function start() {
     playerScore.setTransform(canvas.width/2 - canvas.width/20 -10, canvas.height/20);
     botScore.setTransform(canvas.width/2 + canvas.width/20 - 10, canvas.height/20);
     stage.addChild(playerScore, botScore);
- 
- 
- //updating the stage
+
+    //updating the stage
     stage.update();
+
+
 }
 
 function handleProgress() {
@@ -187,12 +188,29 @@ function handleClick() {
     stage.update();
 }
 
+function movePlayerUp(delta){
+    return delta;
+}
 
+var key;
 
 function tick(event){
 	/*stage.getChildAt(0).x+=5;
 	if(stage.getChildAt(0).x >=1300){
 		stage.getChildAt(0).x=0;
 	}*/
+    if(key.isPressed('up'))
+    {
+        if(playerHuman.y>=39)
+        {
+        playerHuman.y-=15;
+        }
+    }
+    if(key.isPressed('down'))
+    {
+        console.log('iei');
+        playerHuman.y+=15;
+    }
+
 	stage.update();
 }
