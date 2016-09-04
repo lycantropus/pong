@@ -115,8 +115,9 @@ function init() {
 
     resize();
 
-    ballSpeedX=11;
-    ballSpeedY=-11;
+    //TODO aumentar velocidade a cada toque e relativizar ao tamanho da janela
+    ballSpeedX=14;
+    ballSpeedY=-14;
 
 
     stage.update();
@@ -214,15 +215,18 @@ function update(){
 
     //bot
     //veloc 9
-    if(playerBot.y < ball.y && playerBot.y <= canvas.height - (39+ playerImage.height*2)) {
-        playerBot.y = playerBot.y + 9;
+    //TODO mudar player high para racio das barras horizontais em relaçao ao tamanho vertical
+    if(playerBot.y+30 < ball.y &&
+       playerBot.y <= canvas.height - (canvas.height/18 + playerImage.height)) {
+       playerBot.y = playerBot.y + 15;
     }
-    else if(playerBot.y > ball.y && playerBot.y >= 39) {
-        playerBot.y = playerBot.y - 9;
+    else if(playerBot.y+30 > ball.y &&
+            playerBot.y >= canvas.height/18) {
+            playerBot.y = playerBot.y - 15;
     }
 
     //horizontal inversion
-    if(ball.y <= 38)
+    if(ball.y <= playerImage.height)
     {
         ballSpeedY = -ballSpeedY;
         //SoundJS.play('wall');
@@ -252,7 +256,11 @@ function update(){
 
     //bot collision
 
-    if(ball.x + 30 > playerBot.x && ball.x + 30 < playerBot.x + 22 && ball.y >= playerBot.y && ball.y < playerBot.y + 75)
+    if( ball.x + playerImage.width >= playerBot.x &&
+        ball.x + playerImage.width < playerBot.x + 14 &&
+        ball.y >= playerBot.y &&
+        ball.y < playerBot.y + 60
+        )
     {
         ballSpeedX *= -1;
         //SoundJS.play('hit');
@@ -260,7 +268,10 @@ function update(){
 
     //Player collision
 
-    if(ball.x <= playerHuman.x + 22 && ball.x > playerHuman.x && ball.y >= playerHuman.y && ball.y < playerHuman.y + 75)
+    if(ball.x <= playerHuman.x + playerImage.width &&
+       ball.x > playerHuman.x &&
+       ball.y >= playerHuman.y &&
+       ball.y < playerHuman.y + 60)
     {
         ballSpeedX *= -1;
         //SoundJS.play('hit');
@@ -282,14 +293,14 @@ function tick(event){
 	}*/
     if(key.isPressed('up')|| key.isPressed('w'))
     {
-        if(playerHuman.y>=39)
+        if(playerHuman.y>=canvas.height/18)
         {
         playerHuman.y-=15;
         }
     }
     if(key.isPressed('down') || key.isPressed('d'))
     {
-        if(playerHuman.y<=canvas.height - (39+ playerImage.height*2))
+        if(playerHuman.y<=canvas.height - (canvas.height/18 + playerImage.height))
         {
             playerHuman.y+=15;
         }
