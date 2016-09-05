@@ -231,14 +231,16 @@ function update(){
             playerBot.y = playerBot.y - 15;
     }
 
-    //horizontal inversion
-    if(ball.y <= playerImage.height)
+    //vertical inversion
+    if(ball.y <= canvas.height/18)
     {
         ballSpeedY = -ballSpeedY;
+        console.log("top invertion at: " + ball.y);
         createjs.Sound.play('bounce');
     }
-    if(ball.y >= canvas.height -  playerImage.height){
+    else if(ball.y >= canvas.height -  (canvas.height/18 + 16)){
         ballSpeedY = -ballSpeedY;
+        console.log("bottom invertion at: " + canvas.height/18);
         createjs.Sound.play('bounce');
     }
 
