@@ -39,7 +39,7 @@ function resize() {
     if(background!=null)
     background.setTransform(0,0,canvas.width/backgroundImage.width , (canvas.height/backgroundImage.height ));
 
-    if(playerHuman != null)
+    if(playerHuman!=null)
     playerHuman.setTransform(10, canvas.height/2 - playerImage.height, 1, 1);
 
     if(playerBot!=null)
@@ -105,19 +105,27 @@ function init() {
     preload = new createjs.LoadQueue(false);
     preload.addEventListener("complete", handleComplete);
     preload.addEventListener("progress", handleProgress);
-
+    preload.installPlugin(createjs.Sound);
     //preload.loadFile({id: "background", src:"images/background.png"});
     preload.loadManifest([
         {id: "background", src:"images/background.png"},
         {id: "ball", src:"images/ball.png"},
-        {id: "player", src:"images/player.png"}
+        {id: "player", src:"images/player.png"},
+        {id:"bounce", src:"sounds/ping_pong_8bit_plop.ogg"},
+        {id:"hit", src:"sounds/ping_pong_8bit_beeep.ogg"},
+        {id:"fall", src:"sounds/ping_pong_8bit_peeeeeep.ogg"}
+
         ]);
+
+
 
     resize();
 
     //TODO aumentar velocidade a cada toque e relativizar ao tamanho da janela
     ballSpeedX=14;
     ballSpeedY=-14;
+
+
 
 
     stage.update();
@@ -137,18 +145,14 @@ function start() {
  
     ball = new createjs.Bitmap(ballImage);
     ball.setTransform(canvas.width/2 - ballImage.width, canvas.height/2 - ballImage.height, 1, 1);
-    initialBallX=ball.x;
-    initialBallY=ball.y;
-    console.log("startinitx: "+initialBallX);
-    console.log("startinity: "+initialBallY);
     stage.addChild(ball);
  
 
     playerHuman = new createjs.Bitmap(playerImage);
     playerBot = new createjs.Bitmap(playerImage);
     //console.log(playerHuman.height);
-    playerHuman.setTransform(10, canvas.height/2 - playerImage.height, 2, 2);
-    playerBot.setTransform(canvas.width-35, canvas.height/2 - playerImage.height, 2, 2);
+    playerHuman.setTransform(10, canvas.height/2 - playerImage.height, 1, 1);
+    playerBot.setTransform(canvas.width-35, canvas.height/2 - playerImage.height, 1, 1);
     stage.addChild(playerHuman, playerBot);
 
     playerScore = new createjs.Text("0"," bold 30px Verdana",LoadingBarColor  );
@@ -158,19 +162,22 @@ function start() {
     botScore.setTransform(canvas.width/2 + canvas.width/20 - 10, canvas.height/20);
     stage.addChild(playerScore, botScore);
 
+    ball.x=canvas.width/2;
+    ball.y=canvas.height/2;
+
     //updating the stage
     stage.update();
 
 
 }
 
-function handleProgress() {
+function handleProgress(event) {
  
     loadingBar.scaleX = preload.progress * loadingBarWidth;
  
     progresPrecentage = Math.round(preload.progress*100);
     loadProgressLabel.text = progresPrecentage + "% Loaded" ;
-     
+
     stage.update();
  
 }
@@ -214,8 +221,7 @@ function update(){
 
 
     //bot
-    //veloc 9
-    //TODO mudar player high para racio das barras horizontais em relaçao ao tamanho vertical
+    //veloc 15
     if(playerBot.y+30 < ball.y &&
        playerBot.y <= canvas.height - (canvas.height/18 + playerImage.height)) {
        playerBot.y = playerBot.y + 15;
@@ -229,11 +235,11 @@ function update(){
     if(ball.y <= playerImage.height)
     {
         ballSpeedY = -ballSpeedY;
-        //SoundJS.play('wall');
+        createjs.Sound.play('bounce');
     }
     if(ball.y >= canvas.height -  playerImage.height){
         ballSpeedY = -ballSpeedY;
-        //SoundJS.play('wall');
+        createjs.Sound.play('bounce');
     }
 
     //bot score
@@ -242,7 +248,7 @@ function update(){
         ballSpeedX= -ballSpeedX;
         botScore.text = parseInt(botScore.text + 1);
         reset();
-        //SoundJS.play('enemyScore');
+        createjs.Sound.play('fall');
     }
 
     //player score
@@ -251,7 +257,7 @@ function update(){
         ballSpeedX= -ballSpeedX;
         playerScore.text = parseInt(playerScore.text + 1);
         reset();
-        //SoundJS.play('playerScore');
+        createjs.Sound.play('fall');
     }
 
     //bot collision
@@ -263,7 +269,7 @@ function update(){
         )
     {
         ballSpeedX *= -1;
-        //SoundJS.play('hit');
+        createjs.Sound.play('hit');
     }
 
     //Player collision
@@ -274,23 +280,26 @@ function update(){
        ball.y < playerHuman.y + 60)
     {
         ballSpeedX *= -1;
-        //SoundJS.play('hit');
+        createjs.Sound.play('hit');
     }
 
 
-    //console.log("xspeed: "+ ball.x);
-    //console.log("yspeed: "+ ballSpeedY);
+    if(playerScore.text== '5'){
+        alert("You Win");
+        start();
+    }
 
+    if(botScore.text== '5'){
+        alert("CPU Wins");
+        start();
+    }
 
 }
 
 
 
-function tick(event){
-	/*stage.getChildAt(0).x+=5;
-	if(stage.getChildAt(0).x >=1300){
-		stage.getChildAt(0).x=0;
-	}*/
+function tick(){
+
     if(key.isPressed('up')|| key.isPressed('w'))
     {
         if(playerHuman.y>=canvas.height/18)
